@@ -3,33 +3,70 @@ import { useSelector, useDispatch } from 'react-redux';
 import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
-const CartItem = ({ onContinueShopping }) => {
+
+
+function CartItem ({ onContinueShopping }){
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
- 
+    let total = 0;
+    cart.forEach((item)=>{
+        const {quantity, cost} = item;
+        const numericCost = parseFloat(cost.substring(1));
+        const itemTotal = numericCost * quantity;
+        total += itemTotal;
+
+
+    })
+    return total
   };
 
   const handleContinueShopping = (e) => {
-   
+   e.preventDefault();
+   onContinueShopping(e);
   };
 
+  const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
+  };
 
 
   const handleIncrement = (item) => {
+    const currentQuantity = item.quantity ? item.quantity : 1;
+
+    dispatch(updateQuantity({
+        name: item.name,
+        quantity: currentQuantity+1
+
+    }))
   };
 
   const handleDecrement = (item) => {
-   
+    const currentQuantity = item.quantity ? item.quantity : 0;
+
+    if(currentQuantity>1){
+        dispatch(updateQuantity({
+            name: item.name,
+            quantity: currentQuantity - 1
+    
+        }))} 
+    else{
+        dispatch(removeItem(item.name));   
+    }
   };
 
   const handleRemove = (item) => {
+    dispatch(removeItem(item.name))
   };
 
   // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
+    const {cost, quantity} = item;
+    const numericCost = parseFloat(cost.substring(1));
+    return numericCost * quantity;
+
   };
 
   return (
@@ -64,5 +101,3 @@ const CartItem = ({ onContinueShopping }) => {
 };
 
 export default CartItem;
-
-
